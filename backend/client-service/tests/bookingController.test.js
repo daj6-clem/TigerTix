@@ -1,106 +1,103 @@
 // tests/bookingController.test.js
-const httpMocks = require('node-mocks-http');
+const path = require('path');
+process.env.TEST_DB = path.resolve(__dirname, '../../shared-db/database_test.sqlite')
 
-// Mock sqlite3 to avoid real DB operations
-jest.mock('sqlite3', () => {
-  const mDb = {
-    serialize: jest.fn((fn) => fn()),
-    run: jest.fn((...args) => {
-      const cb = args[args.length - 1];
-      if (typeof cb === 'function') setImmediate(() => cb(null));
-    }),
-    prepare: jest.fn(() => ({
-      run: jest.fn((...args) => {
-        const cb = args[args.length - 1];
-        if (typeof cb === 'function') setImmediate(() => cb(null));
-      }),
-      finalize: jest.fn(),
-    })),
-  };
-  return { verbose: jest.fn(() => ({ Database: jest.fn(() => mDb) })) };
+const httpMocks = require('node-mocks-http');
+const {prepareBooking, confirmBooking, setPendingBooking} = require('../controllers/bookingController');
+
+test('check database tables', async () => {
+  const sqlite3 = require('sqlite3').verbose();
+  const db = new sqlite3.Database(process.env.TEST_DB);
+
+  const rows = await new Promise((resolve, reject) => {
+    db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
+    });
+  });
+
+  console.log("Tables in DB:", rows.map(r => r.name));
+
+  await new Promise((resolve, reject) => {
+    db.close((err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
 });
 
-describe('bookingController', () => {
-  let bookingController;
+test('prepareBooking returns 400 if fields are missing', () => {
+  setPendingBooking(null);
 
-  beforeEach(() => {
-    jest.resetModules();
-    bookingController = require('../controllers/bookingController');
-    // Reset pendingBooking before each test
-    if (bookingController.__setPendingBooking) {
-      bookingController.__setPendingBooking(null);
-    }
+
+  const request = httpMocks.createRequest({
+    method: 'POST',
+    body: { tickets: 2 },
   });
 
-  test('prepareBooking sets pendingBooking and returns JSON', () => {
-    const req = httpMocks.createRequest({
-      method: 'POST',
-      body: { event: 'Jazz Night', tickets: 2 },
-    });
-    const res = httpMocks.createResponse();
+  const response = httpMocks.createResponse();
 
-    bookingController.prepareBooking(req, res);
+  prepareBooking(request, response);
 
-    const data = res._getJSONData();
-    expect(res.statusCode).toBe(200);
-    expect(data).toHaveProperty('pendingBooking');
-    expect(data.pendingBooking).toEqual({ event: 'Jazz Night', tickets: 2 });
+  const data = response._getJSONData();
+  expect(response.statusCode).toBe(400);
+  expect(data).toHaveProperty('error');
+});
+
+test('confirmBooking returns 400 if no pendingBooking', async () => {
+  setPendingBooking(null);
+  
+  const request = httpMocks.createRequest({
+    method: 'POST',
+    body: { event: 'Jazz Night', tickets: 2 },
   });
+  const response = httpMocks.createResponse();
 
-  test('prepareBooking returns 400 if fields are missing', () => {
-    const req = httpMocks.createRequest({
-      method: 'POST',
-      body: { tickets: 2 }, // missing event
-    });
-    const res = httpMocks.createResponse();
+  await confirmBooking(request, response);
 
-    bookingController.prepareBooking(req, res);
+  const data = response._getJSONData();
+  expect(data).toHaveProperty('error');
+  expect(data.error).toMatch(/No pending booking/);
+});
 
-    const data = res._getJSONData();
-    expect(res.statusCode).toBe(400);
-    expect(data).toHaveProperty('error');
+test('prepareBooking sets pendingBooking and returns JSON', () => {
+  setPendingBooking(null);
+
+  const request = httpMocks.createRequest({
+    method: 'POST',
+    body: { eventId: 1, tickets: 2, eventName: 'Jazz Night'},
   });
+  const response = httpMocks.createResponse();
 
-  test('confirmBooking works if pendingBooking matches request', async () => {
-    // Set pendingBooking via helper
-    bookingController.__setPendingBooking({ event: 'Jazz Night', tickets: 2 });
+  prepareBooking(request, response);
 
-    const req = httpMocks.createRequest({
-      method: 'POST',
-      body: { event: 'Jazz Night', tickets: 2 },
-    });
-    const res = httpMocks.createResponse();
+  const data = response._getJSONData();
+  expect(response.statusCode).toBe(200);
+  expect(data).toHaveProperty('pendingBooking');
+  expect(data.pendingBooking).toEqual({ id: 1, name: 'Jazz Night', tickets: 2});
+});
 
-    await new Promise((resolve) => {
-      res.json = (data) => {
-        res._json = data;
-        resolve();
-      };
-      bookingController.confirmBooking(req, res);
-    });
+test('confirmBooking works if pendingBooking matches request', async () => {
+  setPendingBooking({ id: 1, tickets: 2, eventName: 'Jazz Night' });
 
-    const data = res._json;
-    expect(data).toHaveProperty('message');
-    expect(data.message).toMatch(/Booking confirmed for Jazz Night/);
+  const request = httpMocks.createRequest({
+    method: 'POST',
+    body: { eventId: 1, tickets: 2, eventName: 'Jazz Night' },
   });
+  const response = httpMocks.createResponse();
 
-  test('confirmBooking returns 400 if no pendingBooking', async () => {
-    const req = httpMocks.createRequest({
-      method: 'POST',
-      body: { event: 'Jazz Night', tickets: 2 },
-    });
-    const res = httpMocks.createResponse();
+  return new Promise((resolve) => {
+    response.json = (data) => {
+      response._json = data;
+      resolve();
+    };
 
-    await new Promise((resolve) => {
-      res.json = (data) => {
-        res._json = data;
-        resolve();
-      };
-      bookingController.confirmBooking(req, res);
-    });
+    confirmBooking(request, response);
+  }).then(() => {
+    
+  const data = response._json;
+  expect(data).toHaveProperty('message');
+  expect(data.message).toMatch(/Booking confirmed for Jazz Night/);
 
-    const data = res._json;
-    expect(data).toHaveProperty('error');
-    expect(data.error).toMatch(/No pending booking/);
   });
 });

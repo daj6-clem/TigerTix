@@ -20,7 +20,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
-
 let pendingBooking = null;
 
 // Step 1: Prepare a booking
@@ -108,4 +107,9 @@ exports.confirmBooking = (req, res) => {
       stmt.finalize();
     });
   });
+};
+
+// Helper function for testing- will set bookings to null.
+exports.setPendingBooking = (booking) => {
+  pendingBooking = booking;
 };
