@@ -1,0 +1,114 @@
+{
+	"info": {
+		"_postman_id": "f02d73ed-681f-4151-bff5-d80494bf0666",
+		"name": "TigerTix",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49029180",
+		"_collection_link": "https://daj6-cd687bf2-6891389.postman.co/workspace/b69b48f1-d064-4fce-a2e8-137dfaa73e73/collection/49029180-f02d73ed-681f-4151-bff5-d80494bf0666?action=share&source=collection_link&creator=49029180"
+	},
+	"item": [
+		{
+			"name": "Post Event",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Clemson Coding Workshop\",\r\n  \"date\": \"2025-10-15\",\r\n  \"tickets\": 250\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/admin/events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Events",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6001/api/events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6001",
+					"path": [
+						"api",
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "purchase 1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6001/api/events/1/purchase",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6001",
+					"path": [
+						"api",
+						"events",
+						"1",
+						"purchase"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "eventId",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

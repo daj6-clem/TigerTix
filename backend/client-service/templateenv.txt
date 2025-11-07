@@ -1,0 +1,2 @@
+The .env file should contain the following:
+OPENAI_API_KEY=sk-proj-OPENAI_API_KEY_GOES_HERE_GPT-4o-mini

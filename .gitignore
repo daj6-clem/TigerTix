@@ -1,0 +1,8 @@
+# Node.js
+.env
+node_modules/
+npm-debug.log
+package-lock.json
+
+# React build folder
+frontend/build/
