@@ -1,4 +1,5 @@
-const OpenAI = require("openai");
+require("dotenv").config();
+const {OpenAI} = require("openai");
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
 exports.parseInput = async(req, res) => {
@@ -21,32 +22,12 @@ exports.parseInput = async(req, res) => {
         let raw = response.output[0].content[0].text;
         raw = raw.replace(/```json\s*/i, "").replace(/```/g, "").trim();
 
-
         let data;
 
         try {
             data = JSON.parse(raw);
         } catch {
-            // Keyword-based fallback
-            const lower = text.toLowerCase();
-            let intent = "view";
-            if (lower.includes("book") || lower.includes("purchase")) {
-                intent = "book";
-            }
-
-            const ticketsMatch = text.match(/(\d+)\s*tickets?/i);
-            const tickets = ticketsMatch ? parseInt(ticketsMatch[1]) : 1;
-
-            const eventMatch = text.match(/for\s+(.+)/i);
-            const event = eventMatch ? eventMatch[1].trim() : "Unknown event";
-
-            data = {event, tickets, intent};
-
-            return res.json({
-                parsed: data,
-                fallback: true,
-                message: "Used keyword-based fallback because LLM parsing failed."
-            });
+            return await exports.parseFallback(req, res);
         }
 
         res.json({parsed: data});
@@ -54,4 +35,29 @@ exports.parseInput = async(req, res) => {
         console.error("LLM error:", err);
         res.status(500).json({error: "Failed to process request." });
     }
+};
+
+exports.parseFallback = async(req, res) => {
+    // Keyword-based fallback
+    const {text} = req.body;
+    const lower = text.toLowerCase();
+    let intent = "view";
+
+    if (lower.includes("book") || lower.includes("purchase") || lower.includes("buy")) {
+        intent = "book";
+    }
+
+    const ticketsMatch = text.match(/(\d+)\s*tickets?/i);
+    const tickets = ticketsMatch ? parseInt(ticketsMatch[1]) : 1;
+
+    const eventMatch = text.match(/for\s+(.+)/i);
+    const event = eventMatch ? eventMatch[1].trim() : "Unknown event";
+
+    const data = {event, tickets, intent};
+
+    return res.json({
+        parsed: data,
+        fallback: true,
+        message: "Used keyword-based fallback because LLM parsing failed."
+    });
 };
