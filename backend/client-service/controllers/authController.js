@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const {createUser, getUserByName} = require("../models/User.js");
 
 const JWT_SECRET = process.env.JWT_SECRET || "devsecret";
+const JWT_EXPIRES_IN = 60 * 60 * 1000;
 
 export const register = async(req, res) => {
     try {
@@ -41,7 +42,14 @@ export const login = async(req, res) => {
             {expiresIn: "1h"}
         );
 
-        res.json({token});
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAGE: JWT_EXPIRES_IN,
+        });
+
+        res.json({message: "Logged in successfully."});
     } catch (err) {
         console.error("Login error:", err);
         res.status(500).json({message: "Login failed"});
@@ -49,5 +57,6 @@ export const login = async(req, res) => {
 };
 
 export const logout = async (req, res) => {
+    res.clearCookie("token");
     res.json({message: "Logged out."});
 };
