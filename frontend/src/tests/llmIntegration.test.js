@@ -92,7 +92,7 @@ describe('LLM-driven ticket booking integration tests', () => {
     // Trigger the booking
     await bookTicketViaLLM(
       'Rock Concert',
-      /LLM confirmed ticket booking for Rock Concert/i
+      /Ticket purchased successfully for Rock Concert./i
     );
 
     // Expect the frontend to update ticket count (optimistic update + fetch)
