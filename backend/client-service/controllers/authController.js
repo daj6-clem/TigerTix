@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const {createUser, getUserByName} = require("../models/User.js");
 
 const JWT_SECRET = process.env.JWT_SECRET || "devsecret";
-const JWT_EXPIRES_IN = 60 * 60 * 1000;
+const JWT_EXPIRES_IN = 30 * 60 * 1000;
 
 export const register = async(req, res) => {
     try {
@@ -39,7 +39,7 @@ export const login = async(req, res) => {
         const token = jwt.sign(
             {id: user.id, username: user.username},
             JWT_SECRET,
-            {expiresIn: "1h"}
+            {expiresIn: "30m"}
         );
 
         res.cookie("token", token, {
