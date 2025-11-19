@@ -1,16 +1,16 @@
-const express = require('express');
+import express from 'express';
+import {listEvents, buyTicket} from '../controllers/clientController.js';
+import {prepareBooking, confirmBooking} from '../controllers/bookingController.js';
+import {verifyToken} from '../middleware/authMiddleware.js';
+
 const router = express.Router();
 
-const clientController = require('../controllers/clientController');
-const bookingController = require('../controllers/bookingController');
-const {verifyToken} = require('../middleware/authMiddleware');
-
 // Client routes
-router.get('/events', clientController.listEvents);
-router.post('/events/:id/purchase', verifyToken, clientController.buyTicket);
+router.get('/events', listEvents);
+router.post('/events/:id/purchase', buyTicket);
 
 // Booking routes
-router.post('/prepare-booking', verifyToken, bookingController.prepareBooking);
-router.post('/confirm-booking', verifyToken, bookingController.confirmBooking);
+router.post('/prepare-booking', prepareBooking);
+router.post('/confirm-booking', confirmBooking);
 
-module.exports = router;
+export default router;

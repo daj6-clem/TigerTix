@@ -1,5 +1,5 @@
 // controllers/clientController.js
-const { getAllEvents, purchaseTicket } = require('../models/clientModel');
+import { getAllEvents, purchaseTicket } from '../models/clientModel.js';
 
 // GET /api/events
 //lists events
@@ -28,4 +28,4 @@ const buyTicket = async (req, res) => {
   }
 };
 
-module.exports = { listEvents, buyTicket };
+export { listEvents, buyTicket };

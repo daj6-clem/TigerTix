@@ -1,8 +1,8 @@
 // controllers/authController.js
 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const {createUser, getUserByName} = require("../models/User.js");
+import bcrypt  from "bcryptjs";
+import jwt from "jsonwebtoken";
+import {createUser, getUserByName} from "../models/User.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "devsecret";
 const JWT_EXPIRES_IN = 30 * 60 * 1000;
@@ -59,4 +59,17 @@ export const login = async(req, res) => {
 export const logout = async (req, res) => {
     res.clearCookie("token");
     res.json({message: "Logged out."});
+};
+
+export const getCurrentUser = (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) return res.status(401).json({message: "Not authenticated"});
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+        res.json({id: decoded.id, username: decoded.username});
+    } catch(err) {
+        console.error("Get current user error:", err);
+        res.status(401).json({message: "Invalid or expired token"});
+    }
 };

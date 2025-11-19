@@ -1,8 +1,8 @@
-require("dotenv").config();
-const {OpenAI} = require("openai");
+import 'dotenv/config';
+import OpenAI from 'openai';
 const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
 
-exports.parseInput = async(req, res) => {
+export const parseInput = async(req, res) => {
     const { text } = req.body;
 
     if (!text) {
@@ -37,7 +37,7 @@ exports.parseInput = async(req, res) => {
     }
 };
 
-exports.parseFallback = async(req, res) => {
+export const parseFallback = async(req, res) => {
     // Keyword-based fallback
     const {text} = req.body;
     const lower = text.toLowerCase();

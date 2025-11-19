@@ -1,5 +1,5 @@
 // models/User.js
-import db from "../../db.js";
+import db from "../../shared-db/db.js";
 
 function createUser(username, passHash) {
     return new Promise((resolve, reject) => {
@@ -26,4 +26,4 @@ function getUserByName(username) {
     });
 }
 
-module.exports = {createUser, getUserByName};
+export {createUser, getUserByName};

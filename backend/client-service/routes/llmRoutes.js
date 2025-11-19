@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import {parseInput} from '../controllers/llmController.js';
+
 const router = express.Router();
-const { parseInput } = require('../controllers/llmController');
 
 router.post('/parse', parseInput);
 
-module.exports = router;
+export default router;

@@ -1,13 +1,18 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import VoiceChat from './VoiceChat';
 import useTextToSpeech from './useTextToSpeech';
 import './App.css';
+import {AuthContext} from "./AuthContext";
+import {useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 
-function App() {
+export default function App() {
   const [events, setEvents] = useState([]);
   const [chatMessages, setChatMessages] = useState([]);
   const { speak, stop } = useTextToSpeech();
   const [statusMessage, setStatusMessage] = useState('');
+  const {user, logout} = useContext(AuthContext);
+  const navigate = useNavigate();
 
   // LLM Parsing state
   const [llmInput, setLlmInput] = useState('');
@@ -17,8 +22,14 @@ function App() {
 
   const fetchEvents = async () => {
     try {
-      const res = await fetch('http://localhost:6001/api/events');
+      console.log('Fetching events...');
+      const res = await fetch('http://localhost:6001/api/events', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      console.log('Reponse received.');
       const data = await res.json();
+      console.log('data got');
       setEvents(data);
     } catch (err) {
       console.error('Error fetching events:', err);
@@ -33,6 +44,7 @@ function App() {
     try {
       const res = await fetch(`http://localhost:6001/api/events/${id}/purchase`, {
         method: 'POST',
+        credentials: 'include',
       });
       if (res.ok) {
         const event = events.find((e) => e.id === id);
@@ -65,6 +77,7 @@ const handleLLMParse = async () => {
   try {
     const res = await fetch('http://localhost:6001/api/llm/parse', {
       method: 'POST',
+      credentials: 'include',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ text: llmInput }),
     });
@@ -119,6 +132,7 @@ const handleSpeechResult = async (transcript) => {
       // Send to LLM service
       const response = await fetch('http://localhost:6001/api/llm/parse', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -171,6 +185,24 @@ const handleSpeechResult = async (transcript) => {
       </header>
 
       <main id="main" tabIndex={-1}>
+        <div style={{
+          textAlign: "right",
+          marginBottom: "1rem",
+          fontSize: "1rem"
+        }}>
+          {user && (
+            <>
+              <span>Logged in as <strong>{user.username}</strong></span>
+              <button
+                onClick={logout}
+                style={{marginLeft: "1rem"}}
+              >
+                Logout
+              </button>
+            </>
+          )}
+        </div>
+
         <div className="status-wrapper">
           {statusMessage && (
             <p className="status-visible" role="status">{statusMessage}</p>
@@ -265,6 +297,7 @@ const handleSpeechResult = async (transcript) => {
                 // Step 1: Prepare the booking on the backend
                 const prepareRes = await fetch("http://localhost:6001/api/prepare-booking", {
                   method: "POST",
+                  credentials: "include",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     eventId: pendingBooking.id,
@@ -282,6 +315,7 @@ const handleSpeechResult = async (transcript) => {
                 // Step 2: Confirm the booking
                 const confirmRes = await fetch("http://localhost:6001/api/confirm-booking", {
                   method: "POST",
+                  credentials: "include",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     eventId: pendingBooking.id,
@@ -329,5 +363,3 @@ const handleSpeechResult = async (transcript) => {
     </div>
   );
 }
-
-export default App;

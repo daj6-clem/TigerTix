@@ -1,7 +1,11 @@
 console.log("BookingController loaded!");
 
-const path = require("path");
-const sqlite3 = require("sqlite3").verbose();
+import path from "path";
+import sqlite3 from "sqlite3";
+import {fileURLToPath} from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Shared database path (same as in clientModel.js)
 const dbPath = path.resolve(__dirname, "../../shared-db/database.sqlite");
@@ -23,7 +27,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 let pendingBooking = null;
 
 // Step 1: Prepare a booking
-exports.prepareBooking = (req, res) => {
+export const prepareBooking = (req, res) => {
   const { eventId, tickets, eventName } = req.body;
 
   // Validate input
@@ -43,7 +47,7 @@ exports.prepareBooking = (req, res) => {
 
 
 // Step 2: Confirm a booking
-exports.confirmBooking = (req, res) => {
+export const confirmBooking = (req, res) => {
   console.log("Hit /confirm-booking route", req.body);
 
   const { eventId, eventName, tickets } = req.body;
@@ -110,6 +114,6 @@ exports.confirmBooking = (req, res) => {
 };
 
 // Helper function for testing- will set bookings to null.
-exports.setPendingBooking = (booking) => {
+export const setPendingBooking = (booking) => {
   pendingBooking = booking;
 };

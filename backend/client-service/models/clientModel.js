@@ -1,6 +1,10 @@
 // models/clientModel.js
-const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
+import path from 'path';
+import {fileURLToPath} from 'url';
+import sqlite3 from 'sqlite3';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Shared database path
 const dbPath = path.resolve(__dirname, '../../shared-db/database.sqlite');
@@ -37,4 +41,4 @@ const purchaseTicket = (id) => {
   });
 };
 
-module.exports = { getAllEvents, purchaseTicket };
+export { getAllEvents, purchaseTicket };
