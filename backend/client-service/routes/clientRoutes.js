@@ -7,10 +7,10 @@ const router = express.Router();
 
 // Client routes
 router.get('/events', listEvents);
-router.post('/events/:id/purchase', buyTicket);
+router.post('/events/:id/purchase', verifyToken, buyTicket);
 
 // Booking routes
-router.post('/prepare-booking', prepareBooking);
-router.post('/confirm-booking', confirmBooking);
+router.post('/prepare-booking', verifyToken, prepareBooking);
+router.post('/confirm-booking', verifyToken, confirmBooking);
 
 export default router;
