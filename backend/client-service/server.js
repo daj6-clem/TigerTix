@@ -1,3 +1,4 @@
+// server.js
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -8,18 +9,20 @@ import llmRoutes from './routes/llmRoutes.js';
 
 const app = express();
 
+// Allowed origins
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  /\.vercel\.app$/
+  process.env.FRONTEND_URL, // main frontend
+  /\.vercel\.app$/           // any Vercel preview
 ];
 
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS for API
+// CORS only for API routes
 app.use('/api', cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // allow server/Postman
     if (allowedOrigins.some(o => (o instanceof RegExp ? o.test(origin) : o === origin))) {
       return callback(null, true);
     }
@@ -28,7 +31,7 @@ app.use('/api', cors({
   credentials: true
 }));
 
-// Preflight for API routes only
+// Optional: preflight for auth routes
 app.options('/api/auth/login', cors({ origin: allowedOrigins, credentials: true }));
 app.options('/api/auth/register', cors({ origin: allowedOrigins, credentials: true }));
 
