@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 
 // Point to SQLlite file
 const dbPath = path.join(__dirname, 'database.sqlite');
+console.log("DB path being used:", dbPath);
 
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) console.error('Failed to connect to DB:', err);

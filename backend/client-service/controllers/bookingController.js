@@ -1,22 +1,15 @@
-console.log("BookingController loaded!");
-
+// controllers/bookingController.js
 import db from '../../shared-db/db.js';
-import path from "path";
-import {fileURLToPath} from "url";
-import fs from 'fs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Shared database path (same as in clientModel.js)
-const dbPath = path.resolve(__dirname, "../../shared-db/database.sqlite");
-console.log("Database path being used:", dbPath);
-console.log("DB exists?", fs.existsSync(dbPath));
+console.log("BookingController loaded!");
 
 db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, rows) => {
   if (err) console.error("Error reading tables:", err);
   else console.log("Tables in DB:", rows.map(r => r.name));
 });
+
+export default db;
+
 
 
 let pendingBooking = null;
