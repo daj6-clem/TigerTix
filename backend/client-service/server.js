@@ -21,5 +21,5 @@ app.use('/api', clientRoutes);
 app.use('/api/llm', llmRoutes);
 app.use('/api/auth', authRoutes);
 
-const PORT = 6001;
+const PORT = process.env.PORT || 6001;
 app.listen(PORT, () => console.log(`Client service running at http://localhost:${PORT}`));
