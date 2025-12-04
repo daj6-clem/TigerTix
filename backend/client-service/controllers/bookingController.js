@@ -3,10 +3,12 @@ import db from '../../shared-db/db.js';
 
 console.log("BookingController loaded!");
 
-db.all("SELECT name FROM sqlite_master WHERE type='table';", (err, rows) => {
-  if (err) console.error("Error reading tables:", err);
-  else console.log("Tables in DB:", rows.map(r => r.name));
-});
+try {
+  const rows = db.prepare("SELECT name FROM sqlite_master WHERE type='table';").all();
+  console.log("Tables in DB:", rowsmap(r => r.name));
+} catch (err) {
+  console.error("Error reading tables:", err);
+}
 
 export default db;
 
