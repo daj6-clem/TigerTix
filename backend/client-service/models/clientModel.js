@@ -12,6 +12,8 @@ const dbPath = path.resolve(__dirname, '../shared-db/database.sqlite');
 console.log("DB path: ", dbPath);
 console.log("DB exists?", fs.existsSync(dbPath));
 
+const db = new sqlite3.Database(dbPath);
+
 export default db;
 
 
