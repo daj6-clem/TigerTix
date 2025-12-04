@@ -1,14 +1,16 @@
 // models/clientModel.js
-import db from '../../shared-db/database.sqlite';
 import fs from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import sqlite3 from 'sqlite3';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log("DB path (from db.js):", path.resolve(__dirname, '../../shared-db/database.sqlite'));
-console.log("DB exists?", fs.existsSync(path.resolve(__dirname, '../../shared-db/database.sqlite')));
+const dbPath = path.resolve(__dirname, '../shared-db/database.sqlite');
+
+console.log("DB path: ", dbPath);
+console.log("DB exists?", fs.existsSync(dbPath));
 
 export default db;
 
