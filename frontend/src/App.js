@@ -5,6 +5,7 @@ import './App.css';
 import {AuthContext} from "./AuthContext";
 import {useNavigate} from "react-router-dom";
 import {Link} from "react-router-dom";
+import {API_URL} from './api';
 
 export default function App() {
   const [events, setEvents] = useState([]);
@@ -23,7 +24,7 @@ export default function App() {
   const fetchEvents = async () => {
     try {
       console.log('Fetching events...');
-      const res = await fetch('http://localhost:6001/api/events', {
+      const res = await fetch('${API_URL}/api/events', {
         method: 'GET',
         credentials: 'include',
       });
@@ -42,7 +43,7 @@ export default function App() {
 
   const buyTicket = async (id) => {
     try {
-      const res = await fetch(`http://localhost:6001/api/events/${id}/purchase`, {
+      const res = await fetch(`${API_URL}/api/events/${id}/purchase`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -75,7 +76,7 @@ const handleLLMParse = async () => {
   setPendingBooking(null);
 
   try {
-    const res = await fetch('http://localhost:6001/api/llm/parse', {
+    const res = await fetch('${API_URL}/api/llm/parse', {
       method: 'POST',
       credentials: 'include',
       headers: {'Content-Type': 'application/json'},
@@ -130,7 +131,7 @@ const handleSpeechResult = async (transcript) => {
 
     try {
       // Send to LLM service
-      const response = await fetch('http://localhost:6001/api/llm/parse', {
+      const response = await fetch('${API_URL}/api/llm/parse', {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -295,7 +296,7 @@ const handleSpeechResult = async (transcript) => {
 
               try {
                 // Step 1: Prepare the booking on the backend
-                const prepareRes = await fetch("http://localhost:6001/api/prepare-booking", {
+                const prepareRes = await fetch("${API_URL}/api/prepare-booking", {
                   method: "POST",
                   credentials: "include",
                   headers: { "Content-Type": "application/json" },
@@ -313,7 +314,7 @@ const handleSpeechResult = async (transcript) => {
                 }
 
                 // Step 2: Confirm the booking
-                const confirmRes = await fetch("http://localhost:6001/api/confirm-booking", {
+                const confirmRes = await fetch("${API_URL}/api/confirm-booking", {
                   method: "POST",
                   credentials: "include",
                   headers: { "Content-Type": "application/json" },
