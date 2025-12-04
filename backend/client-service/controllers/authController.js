@@ -31,7 +31,7 @@ export const login = (req, res) => {
 
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax', secure: true });
+    res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true });
     res.json({ message: 'Logged in successfully', user: { id: user.id, username: user.username } });
   } catch (err) {
     console.error("Login error:", err);
