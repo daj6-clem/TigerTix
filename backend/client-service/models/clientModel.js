@@ -10,6 +10,11 @@ const __dirname = path.dirname(__filename);
 const dbPath = path.resolve(__dirname, '../../shared-db/database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
+console.log("DB path:", dbPath);
+import fs from "fs";
+console.log("DB exists?", fs.existsSync(dbPath));
+
+
 //gets all events
 //input: none
 //output: promise that resolves to array of events
