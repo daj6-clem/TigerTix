@@ -1,79 +1,43 @@
 // controllers/authController.js
-
-import bcrypt  from "bcryptjs";
-import jwt from "jsonwebtoken";
-import {createUser, getUserByName} from "../models/User.js";
+import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || "devsecret";
-const JWT_EXPIRES_IN = 30 * 60 * 1000;
+const users = []; // simple in-memory store for demo
 
-export const register = async(req, res) => {
-    try {
-        const {username, password} = req.body;
+export const register = (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ message: "Missing fields" });
+  if (users.find(u => u.username === username)) return res.status(400).json({ message: "User exists" });
 
-        const existing = await getUserByName(username);
-        if (existing) return res.status(409).send("That user already exists.");
-
-        const passHash = await bcrypt.hash(password, 10);
-
-        const user = await createUser(username, passHash);
-
-        res.status(201).json({message: "User registered", userID: user.id});
-    } catch (err) {
-        console.error("Register error:", err);
-
-        res.status(500).json({message: "Registration failed"});
-    }
+  users.push({ username, password });
+  res.status(201).json({ message: "User registered" });
 };
 
-export const login = async(req, res) => {
-    try {
-        const {username, password} = req.body;
+export const login = (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+  if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-        const user = await getUserByName(username);
-        if (!user) return res.status(400).json({message: "Your username or password is incorrect."});
+  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '1h' });
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: true,           // true in production
+    sameSite: 'none',       // allow cross-origin cookies
+    maxAge: 3600000
+  });
 
-        const valid = await bcrypt.compare(password, user.password_hash);
-        if (!valid) return res.status(400).json({message: "Your username or password is incorrect."});
-
-        const token = jwt.sign(
-            {id: user.id, username: user.username},
-            JWT_SECRET,
-            {expiresIn: "30m"}
-        );
-
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: JWT_EXPIRES_IN,
-        });
-
-        res.json({message: "Logged in successfully."});
-    } catch (err) {
-        console.error("Login error:", err);
-        res.status(500).json({message: "Login failed"});
-    }
+  res.json({ message: "Logged in", username });
 };
 
-export const logout = async (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
-    });
-    res.json({message: "Logged out."});
+export const logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
+  });
+  res.json({ message: "Logged out" });
 };
 
 export const getCurrentUser = (req, res) => {
-    try {
-        const token = req.cookies.token;
-        if (!token) return res.status(401).json({message: "Not authenticated"});
-
-        const decoded = jwt.verify(token, JWT_SECRET);
-        res.json({id: decoded.id, username: decoded.username});
-    } catch(err) {
-        console.error("Get current user error:", err);
-        res.status(401).json({message: "Invalid or expired token"});
-    }
+  res.json({ username: req.user.username });
 };
