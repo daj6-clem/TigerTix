@@ -32,7 +32,7 @@ app.use(cors({
 }));
 
 // Handle preflight requests
-app.options('*', cors({
+app.options('/:path(*)', cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
 }));
