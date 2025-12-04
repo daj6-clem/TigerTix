@@ -2,7 +2,6 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import path from 'path';
 
 import clientRoutes from './routes/clientRoutes.js';
 import llmRoutes from './routes/llmRoutes.js';
@@ -12,8 +11,8 @@ const app = express();
 
 // Allowed origins (main frontend + Vercel previews)
 const allowedOrigins = [
-    process.env.FRONTEND_URL, // main frontend
-    /\.vercel\.app$/           // any Vercel preview
+    process.env.FRONTEND_URL, // main frontend URL
+    /\.vercel\.app$/           // any Vercel preview deploy
 ];
 
 // Global CORS middleware
@@ -31,15 +30,12 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(express.static(path.join(process.cwd(), 'client')));
+// --- API routes only ---
 app.use('/api', clientRoutes);
 app.use('/api/llm', llmRoutes);
 app.use('/api/auth', authRoutes);
 
-app.get('/*', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'client', 'index.html'));
-});
-
+// Error handling middleware
 app.use((err, req, res, next) => {
     const origin = req.headers.origin || '*';
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -50,5 +46,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 6001;
 app.listen(PORT, '0.0.0.0', () =>
-    console.log(`Client service running at http://0.0.0.0:${PORT}`)
+    console.log(`Backend API running at http://0.0.0.0:${PORT}`)
 );
