@@ -5,7 +5,7 @@ console.log("BookingController loaded!");
 
 try {
   const rows = db.prepare("SELECT name FROM sqlite_master WHERE type='table';").all();
-  console.log("Tables in DB:", rowsmap(r => r.name));
+  console.log("Tables in DB:", rows.map(r => r.name));
 } catch (err) {
   console.error("Error reading tables:", err);
 }
