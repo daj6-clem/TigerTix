@@ -1,0 +1,9 @@
+{
+  "name": "shared-db",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "db.js",
+  "dependencies": {
+    "sqlite3": "^5.1.6"
+  }
+}

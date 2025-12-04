@@ -1,4 +1,10 @@
 {
+  "name": "tiger-backend",
+  "private": true,
+  "workspaces": [
+    "client-service",
+    "shared-db"
+  ],
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "sqlite3": "^5.1.7"
