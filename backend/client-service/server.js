@@ -22,4 +22,4 @@ app.use('/api/llm', llmRoutes);
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 6001;
-app.listen(PORT, () => console.log(`Client service running at http://localhost:${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Client service running at http://0.0.0.0:${PORT}`));
