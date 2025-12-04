@@ -4,7 +4,7 @@ import {API_URL} from './api';
 
 export const AuthContext = createContext();
 
-const API = "${API_URL}/api/auth"
+const API = `${API_URL}/api/auth`
 
 export function AuthProvider({children}) {
     const [user, setUser] = useState(null);
