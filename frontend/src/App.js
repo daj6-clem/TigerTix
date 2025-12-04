@@ -26,7 +26,7 @@ export default function App() {
   const fetchEvents = async () => {
     try {
       console.log('Fetching events...');
-      const res = await fetch('${API_URL}/api/events', {
+      const res = await fetch(`${API_URL}/api/events`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -78,7 +78,7 @@ const handleLLMParse = async () => {
   setPendingBooking(null);
 
   try {
-    const res = await fetch('${API_URL}/api/llm/parse', {
+    const res = await fetch(`${API_URL}/api/llm/parse`, {
       method: 'POST',
       credentials: 'include',
       headers: {'Content-Type': 'application/json'},
@@ -133,7 +133,7 @@ const handleSpeechResult = async (transcript) => {
 
     try {
       // Send to LLM service
-      const response = await fetch('${API_URL}/api/llm/parse', {
+      const response = await fetch(`${API_URL}/api/llm/parse`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -298,7 +298,7 @@ const handleSpeechResult = async (transcript) => {
 
               try {
                 // Step 1: Prepare the booking on the backend
-                const prepareRes = await fetch("${API_URL}/api/prepare-booking", {
+                const prepareRes = await fetch(`${API_URL}/api/prepare-booking`, {
                   method: "POST",
                   credentials: "include",
                   headers: { "Content-Type": "application/json" },
@@ -316,7 +316,7 @@ const handleSpeechResult = async (transcript) => {
                 }
 
                 // Step 2: Confirm the booking
-                const confirmRes = await fetch("${API_URL}/api/confirm-booking", {
+                const confirmRes = await fetch(`${API_URL}/api/confirm-booking`, {
                   method: "POST",
                   credentials: "include",
                   headers: { "Content-Type": "application/json" },
