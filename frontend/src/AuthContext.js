@@ -1,51 +1,57 @@
-//src/AuthContext.js
-import {createContext, useState, useEffect} from "react";
-import axios from "axios";
-import {API_URL} from './api';
+import { createContext, useState } from "react";
+import { API_URL } from "./api";
 
 export const AuthContext = createContext();
 
-const API = `${API_URL}/api/auth`
-
-export function AuthProvider({children}) {
+export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchUser();
-    }, []);
+    const register = async (username, password) => {
+        const res = await fetch(`${API_URL}/api/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include", // <--- needed for cookies
+            body: JSON.stringify({ username, password }),
+        });
 
-    const fetchUser = async () => {
-        try {
-            const res = await axios.get(`${API}/me`, {withCredentials: true});
-            setUser(res.data);
-        } catch {
-            setUser(null);
-        } finally {
-            setLoading(false);
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.message || "Registration failed");
         }
+
+        const data = await res.json();
+        setUser(data.user); // optional: automatically log in after registration
+        return data;
     };
 
     const login = async (username, password) => {
-        await axios.post(`${API}/login`, {username, password}, {withCredentials: true});
-        await fetchUser();
-    };
+        const res = await fetch(`${API_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include", // <--- MUST for cookies
+            body: JSON.stringify({ username, password }),
+        });
 
-    const register = async (username, password) => {
-        await axios.post(`${API}/register`, {username, password}, {withCredentials: true});
-        await fetchUser();
+        if (!res.ok) {
+            throw new Error("Invalid credentials");
+        }
+
+        const data = await res.json();
+        setUser(data.user);
+        return data;
     };
 
     const logout = async () => {
-        await axios.post(`${API}/logout`, {}, {withCredentials: true});
+        await fetch(`${API_URL}/api/auth/logout`, {
+            method: "POST",
+            credentials: "include",
+        });
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{user, loading, login, register, logout}}>
+        <AuthContext.Provider value={{ user, login, logout, register }}>
             {children}
         </AuthContext.Provider>
     );
-
-
 }
